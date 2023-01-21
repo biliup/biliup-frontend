@@ -1,9 +1,11 @@
 import useSWR from "swr";
+import useSWRMutation from 'swr/mutation';
 
-import {fetcher} from "../libs/api-streamer";
+import {addTemplate, fetcher} from "../libs/api-streamer";
+
 
 export default function useStreamers() {
-  const { data, error, isLoading } = useSWR(process.env.NEXT_PUBLIC_API_SERVER + "/v1/streamers", fetcher);
+  const { data, error, isLoading } = useSWR("/v1/streamers", fetcher);
 
   return {
     isLoading,
