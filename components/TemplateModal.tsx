@@ -63,7 +63,6 @@ const TemplateModal: React.FC<TemplateModalProps> = ({ children }) => {
     //     { value: 'abc', label: '抖音', otherKey: 0 },
     //     { value: 'ulikecam', label: '轻颜相机', disabled: true, otherKey: 1 },
     //     { value: 'jianying', label: '剪映', otherKey: 2 },
-    //     { value: 'toutiao', label: '今日头条', otherKey: 3 },
     // ];
     return (
         <>
@@ -77,6 +76,7 @@ const TemplateModal: React.FC<TemplateModalProps> = ({ children }) => {
                 onOk={handleOk}
                 // style={{ width: 600 }}
                 onCancel={handleCancel}
+                bodyStyle={{ overflow: 'auto', maxHeight: 'calc(100vh - 320px)', paddingLeft: 10, paddingRight: 10 }}
             >
                 <Form getFormApi={formApi => api.current = formApi}>
 
@@ -96,6 +96,22 @@ const TemplateModal: React.FC<TemplateModalProps> = ({ children }) => {
                         rules={[
                             { required: true, message },
                         ]}
+                    />
+                    <Form.Input
+                        field='filename'
+                        label={{text: "文件名模板", optional: true} }
+                        initValue='./video/%Y-%m-%d/%H_%M_%S{title}'
+                        placeholder='./video/%Y-%m-%d/%H_%M_%S{title}'
+                    />
+                    <Form.InputNumber
+                        field='split_size'
+                        label={{text: "分段大小", optional: true} }
+                        suffix={'MB'}
+                    />
+
+                    <Form.TimePicker
+                        field='split_time'
+                        label={{text: '分段时间', optional: true} }
                     />
                     <Form.Select field="upload_id" label={{ text: '投稿模板', optional: true }} style={{ width: 176 }} optionList={list} />
 

@@ -86,7 +86,7 @@ export default function Layout({children}) {
     console.log(styles)
     return (
         <>
-            <SeLayout hasSider={true} className="components-layout-demo semi-light-scrollbar">
+            <SeLayout className="components-layout-demo semi-light-scrollbar">
                 <Sider>
                     <Nav
                         style={navStyle}

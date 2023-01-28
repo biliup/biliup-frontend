@@ -25,6 +25,7 @@ import { List, Descriptions, Rating, ButtonGroup } from '@douyinfe/semi-ui';
 import { useState } from "react";
 import useStreamers from '../data/use-streamers';
 import TemplateModal from '../components/TemplateModal';
+import {DropDownMenuItem} from "@douyinfe/semi-ui/lib/es/dropdown";
 
 export default function Home() {
     const { Header, Footer, Sider, Content } = Layout;
@@ -32,7 +33,16 @@ export default function Home() {
     const { streamers, isLoading } = useStreamers();
     // console.log(streamers);
 
-    const data = streamers;
+    const data = streamers?.map(live => {
+        let status;
+        switch (live.status) {
+            case 'Working': status = <Tag color='red'>直播中</Tag>; break;
+            case 'Idle': status = <Tag color='green'>空闲</Tag>; break;
+            case 'Pending': status = <Tag color='grey'>未知</Tag>; break;
+            case 'Inspecting': status = <Tag color='indigo'>检测中</Tag>; break;
+        }
+        return {...live, status};
+    });
 
     const style = {
         border: '1px solid var(--semi-color-border)',
@@ -47,7 +57,7 @@ export default function Home() {
 
 
 
-    const menu = [
+    const menu: DropDownMenuItem[] = [
         // { node: 'item', name: '编辑', onClick: () => console.log('编辑项目点击') },
         { node: 'item', name: '查看记录' },
         { node: 'divider' },
@@ -111,7 +121,7 @@ export default function Home() {
                             <div style={{ flexGrow: 1, maxWidth: 250 }}>
                                 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                                     <h3 style={{ color: 'var(--semi-color-text-0)', fontWeight: 500 }}>{item.remark}</h3>
-                                    <Tag color='green'>直播中</Tag>
+                                    {item.status}
                                 </div>
                                 {/* <span style={{ color: 'var(--semi-color-text-2)' }}>https://www.douyu.com/156482</span> */}
                                 <Text ellipsis={{ showTooltip: { opts: { style: { wordBreak: 'break-all' } } } }} type="tertiary">{item.url}</Text>

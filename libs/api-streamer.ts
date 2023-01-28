@@ -53,6 +53,14 @@ export interface LiveStreamerEntity {
 	url: string;
 	remark: string;
 	upload_id?: number;
+	status: string;
+}
+
+export interface BiliType {
+	id: number;
+	children: BiliType[];
+	name: string;
+	desc: string;
 }
 
 export function getStreamers() {
