@@ -2,23 +2,22 @@ import { Form, Modal, Notification, Typography } from "@douyinfe/semi-ui";
 import { FormApi } from "@douyinfe/semi-ui/lib/es/form";
 import React, { useRef } from "react";
 import { useState } from "react";
-import { fetcher, sendRequest, StudioEntity } from "../libs/api-streamer";
+import {fetcher, LiveStreamerEntity, sendRequest, StudioEntity} from "../libs/api-streamer";
 import useSWR from "swr";
 import useSWRMutation from 'swr/mutation';
 
 type TemplateModalProps = {
     visible?: boolean
-    // src?: string
+    entity?: LiveStreamerEntity
     children?: React.ReactNode
 }
 
 
-const TemplateModal: React.FC<TemplateModalProps> = ({ children }) => {
+const TemplateModal: React.FC<TemplateModalProps> = ({ children, entity }) => {
     let message = '该项为必填项';
     const api = useRef<FormApi>();
     const { data: templates, error, isLoading } = useSWR<StudioEntity[]>("/v1/upload/streamers", fetcher);
     const { trigger } = useSWRMutation('/v1/streamers', sendRequest)
-
 
     const [visible, setVisible] = useState(false);
     const showDialog = () => {
@@ -78,7 +77,7 @@ const TemplateModal: React.FC<TemplateModalProps> = ({ children }) => {
                 onCancel={handleCancel}
                 bodyStyle={{ overflow: 'auto', maxHeight: 'calc(100vh - 320px)', paddingLeft: 10, paddingRight: 10 }}
             >
-                <Form getFormApi={formApi => api.current = formApi}>
+                <Form initValues={entity} getFormApi={formApi => api.current = formApi}>
 
                     <Form.Input
                         field='remark'
@@ -109,11 +108,12 @@ const TemplateModal: React.FC<TemplateModalProps> = ({ children }) => {
                         suffix={'MB'}
                     />
 
-                    <Form.TimePicker
+                    <Form.InputNumber
                         field='split_time'
                         label={{text: '分段时间', optional: true} }
+                        suffix={'分钟'}
                     />
-                    <Form.Select field="upload_id" label={{ text: '投稿模板', optional: true }} style={{ width: 176 }} optionList={list} />
+                    <Form.Select showClear field="upload_id" label={{ text: '投稿模板', optional: true }} style={{ width: 176 }} optionList={list} />
 
                 </Form>
             </Modal>

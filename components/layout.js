@@ -21,11 +21,14 @@ export default function Layout({children}) {
     const renderWrapper = useCallback(({ itemElement, isSubNav, isInSubNav, props }) => {
         const routerMap = {
             home: "/",
-            about: "/about",
+            history: "/history",
             dashboard: "/dashboard",
             streamers: "/streamers",
             "upload-manager": "/upload-manager",
         };
+        if(!routerMap[props.itemKey]) {
+            return itemElement;
+        }
         return (
             <Link
                 style={{ textDecoration: "none", fontWeight: "600 !important" }}
@@ -36,12 +39,19 @@ export default function Layout({children}) {
         );
         // return itemElement;
     }, []);
-    const [openKeys, setOpenKeys] = useState(['home']);
+    let initOpenKeys = [];
+    console.log("slice(1)", router.pathname.slice(1));
+    if (router.pathname.slice(1) === 'streamers' || router.pathname.slice(1) ===  'history') {
+        initOpenKeys = ['manager'];
+    }
+    const [openKeys, setOpenKeys] = useState(initOpenKeys);
     const [selectedKeys, setSelectedKeys] = useState([router.pathname.slice(1)]);
     const [isCollapsed, setIsCollapsed] = useState(false);
     const items = useMemo(() =>[
-            {itemKey: 'streamers', text: '录播管理', icon: <div style={{
-                    backgroundColor: '#41cd59',
+            {itemKey: 'manager', text: '录播管理',
+                items: [{itemKey: 'streamers', text: '直播管理'}, {itemKey: 'history', text: '历史记录'}],
+                icon: <div style={{
+                    backgroundColor: '#5ac262ff',
                     borderRadius: 'var(--semi-border-radius-medium)',
                     color: 'var(--semi-color-bg-0)',
                     display: 'flex',
@@ -49,7 +59,7 @@ export default function Layout({children}) {
                     padding: '4px'
                 }}><IconVideoListStroked size='small'/></div>},
             {itemKey: 'upload-manager', text: '投稿管理', icon: <div style={{
-                    backgroundColor: '#6f5ff4',
+                    backgroundColor: '#885bd2ff',
                     borderRadius: 'var(--semi-border-radius-medium)',
                     color: 'var(--semi-color-bg-0)',
                     display: 'flex',
@@ -64,11 +74,11 @@ export default function Layout({children}) {
             // },
         ].map(value => {
             value.text = <div style={{
-                color: selectedKeys.some(key => value.itemKey === key) ? 'var(--semi-color-text-0)' : 'var(--semi-color-text-2)',
+                color: selectedKeys.some(key => value.itemKey === key) || (selectedKeys.some(key=> openKeys.some(o=> isSub(key, o))) && openKeys.some(key => value.itemKey === key)) ? 'var(--semi-color-text-0)' : 'var(--semi-color-text-2)',
                 fontWeight: 600
             }}>{value.text}</div>
             return value;
-        }), [selectedKeys]);
+        }), [openKeys, selectedKeys]);
     // const [navStyle, setNavStyle] = useState({ height: '100%' });
     const onSelect = data => {
         setSelectedKeys([...data.selectedKeys]);
@@ -83,7 +93,6 @@ export default function Layout({children}) {
     }, [isCollapsed]);
     const [mode, setMode] = useState('light');
 
-    console.log(styles)
     return (
         <>
             <SeLayout className="components-layout-demo semi-light-scrollbar">
@@ -160,4 +169,11 @@ function footer(mode, setMode) {
                 // marginRight: '12px',
             }}/>
     </Nav.Footer>);
+}
+
+function isSub(key1, key2) {
+    const routerMap = {
+        manager: ["streamers", "history"],
+    };
+    return routerMap[key2]?.includes(key1);
 }

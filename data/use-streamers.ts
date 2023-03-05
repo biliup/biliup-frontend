@@ -1,7 +1,16 @@
 import useSWR from "swr";
 import useSWRMutation from 'swr/mutation';
 
-import {addTemplate, fetcher, LiveStreamerEntity} from "../libs/api-streamer";
+import {
+  addTemplate,
+  BiliType,
+  fetcher,
+  LiveStreamerEntity, proxy,
+  requestDelete,
+  sendRequest,
+  User
+} from "../libs/api-streamer";
+import React, {useEffect, useState} from "react";
 
 
 export default function useStreamers() {
@@ -10,5 +19,58 @@ export default function useStreamers() {
   return {
     isLoading,
     streamers: data,
+  };
+}
+
+export function useBiliUsers() {
+  const {data, error, isLoading} = useSWR<User[]>("/v1/users", fetcher);
+  const [list, setList] = useState<any[]>([]);
+  useEffect(() => {
+    console.log("nonono", data);
+    console.log("nono", !data);
+    if (data?.length === 0) {
+      setList([]);
+    }
+    data?.forEach(item => {
+      (async () => {
+        const res = await fetcher(`/bili/space/myinfo?user=${item.value}`, undefined)
+        const pRes = await proxy(`/bili/proxy?url=${res.data.face}`)
+        const myBlob = await pRes.blob()
+        const newList = data.map(value => {
+          if (value.id === item.id) {
+            return {
+              ...value,
+              name: res.data.name,
+              face: URL.createObjectURL(myBlob),
+            };
+          }
+          return value;
+        });
+        setList(newList);
+        console.log('2????', newList);
+      })()
+    })
+  }, [data]);
+  return {
+    isLoading,
+    isError: error,
+    biliUsers: list,
+  };
+}
+
+export function useTypeTree() {
+  const { data: archivePre, error, isLoading } = useSWR("/bili/archive/pre", fetcher);
+  // console.log(archivePre);
+  const treeData = archivePre?.data.typelist.map((type: BiliType)=> {
+    return {
+      label: type.name,
+      value: type.id,
+      children: type.children
+    };
+  });
+  return {
+    isLoading,
+    isError: error,
+    typeTree: treeData,
   };
 }

@@ -10,7 +10,7 @@ import {
     Form,
     Row,
     Col,
-    Dropdown, SplitButtonGroup, Typography
+    Dropdown, SplitButtonGroup, Typography, Popconfirm
 } from '@douyinfe/semi-ui';
 import {
     IconBell,
@@ -19,13 +19,20 @@ import {
     IconPlusCircle,
     IconHistogram,
     IconLive,
-    IconSetting, IconStoryStroked, IconCheckCircleStroked, IconVideoListStroked, IconTreeTriangleDown
+    IconSetting,
+    IconStoryStroked,
+    IconCheckCircleStroked,
+    IconVideoListStroked,
+    IconTreeTriangleDown,
+    IconSendStroked,
+    IconEdit2Stroked, IconDeleteStroked
 } from '@douyinfe/semi-icons';
 import { List, Descriptions, Rating, ButtonGroup } from '@douyinfe/semi-ui';
 import { useState } from "react";
 import useStreamers from '../data/use-streamers';
 import TemplateModal from '../components/TemplateModal';
 import {DropDownMenuItem} from "@douyinfe/semi-ui/lib/es/dropdown";
+import {LiveStreamerEntity} from "../libs/api-streamer";
 
 export default function Home() {
     const { Header, Footer, Sider, Content } = Layout;
@@ -33,7 +40,7 @@ export default function Home() {
     const { streamers, isLoading } = useStreamers();
     // console.log(streamers);
 
-    const data = streamers?.map(live => {
+    const data: LiveStreamerEntity[] | undefined = streamers?.map(live => {
         let status;
         switch (live.status) {
             case 'Working': status = <Tag color='red'>直播中</Tag>; break;
@@ -126,14 +133,28 @@ export default function Home() {
                                 {/* <span style={{ color: 'var(--semi-color-text-2)' }}>https://www.douyu.com/156482</span> */}
                                 <Text ellipsis={{ showTooltip: { opts: { style: { wordBreak: 'break-all' } } } }} type="tertiary">{item.url}</Text>
                                 <div style={{ margin: '10px 0', display: 'flex', justifyContent: 'flex-end' }}>
-                                    <SplitButtonGroup>
-                                        <TemplateModal>
-                                            <Button theme="light" type='tertiary' size='small'>编辑</Button>
+                                    <ButtonGroup theme='borderless'>
+                                        <TemplateModal entity={item}>
+                                            <Button theme='borderless' icon={<IconEdit2Stroked />}></Button>
                                         </TemplateModal>
-                                        <Dropdown menu={menu} trigger="click" position="bottomRight">
-                                            <Button style={{ padding: '8px 4px' }} type='tertiary' theme="light" size='small' icon={<IconTreeTriangleDown />}></Button>
-                                        </Dropdown>
-                                    </SplitButtonGroup>
+                                        <span className="semi-button-group-line semi-button-group-line-borderless semi-button-group-line-primary"></span>
+                                        <Popconfirm
+                                            title="确定是否要删除？"
+                                            content="此操作将不可逆"
+                                            // onConfirm={onConfirm}
+                                            // onCancel={onCancel}
+                                        >
+                                            <Button theme='borderless' icon={<IconDeleteStroked />}></Button>
+                                        </Popconfirm>
+                                    </ButtonGroup>
+                                    {/*<SplitButtonGroup>*/}
+                                    {/*    <TemplateModal>*/}
+                                    {/*        <Button theme="light" type='tertiary' size='small'>编辑</Button>*/}
+                                    {/*    </TemplateModal>*/}
+                                    {/*    <Dropdown menu={menu} trigger="click" position="bottomRight">*/}
+                                    {/*        <Button style={{ padding: '8px 4px' }} type='tertiary' theme="light" size='small' icon={<IconTreeTriangleDown />}></Button>*/}
+                                    {/*    </Dropdown>*/}
+                                    {/*</SplitButtonGroup>*/}
                                 </div>
                             </div>
                         </List.Item>

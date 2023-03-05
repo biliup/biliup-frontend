@@ -1,30 +1,45 @@
-import { Button, ButtonGroup, Descriptions, Dropdown, Layout, List, Modal, Nav, Rating, SplitButtonGroup } from "@douyinfe/semi-ui";
-import { IconCloud, IconCloudStroked, IconHelpCircle, IconPlusCircle, IconVideoListStroked } from "@douyinfe/semi-icons";
+import {
+    Button,
+    ButtonGroup,
+    Descriptions,
+    Dropdown,
+    Layout,
+    List,
+    Modal,
+    Nav,
+    Popconfirm,
+    Rating, SideSheet,
+    SplitButtonGroup
+} from "@douyinfe/semi-ui";
+import {
+    IconCloud,
+    IconCloudStroked,
+    IconHelpCircle, IconMinusCircle,
+    IconPlusCircle,
+    IconUserListStroked,
+    IconVideoListStroked
+} from "@douyinfe/semi-icons";
 import { useState } from "react";
 import Link from "next/link";
 import { Card, Avatar, Popover } from '@douyinfe/semi-ui';
 import { IconInfoCircle, IconTreeTriangleDown, IconSend, IconEdit2Stroked, IconSendStroked, IconDeleteStroked } from '@douyinfe/semi-icons';
 import { fetcher, StudioEntity } from "../../libs/api-streamer";
 import useSWR from "swr";
+import {useRouter} from "next/router";
+import AvatarCard from "../../components/AvatarCard";
+import UserList from "../../components/UserList";
 
 export default function Union() {
     const { Meta } = Card;
     const { Header, Footer, Sider, Content } = Layout;
     const [visible, setVisible] = useState(false);
     const { data: templates, error, isLoading } = useSWR<StudioEntity[]>("/v1/upload/streamers", fetcher);
-    const onClose = () => {
-        setVisible(false);
+    const change = () => {
+        setVisible(!visible);
     };
-    const menu = [
-        { node: 'item', name: '编辑项目', onClick: () => console.log('编辑项目点击') },
-        { node: 'item', name: '重置项目' },
-        { node: 'divider' },
-        { node: 'item', name: '复制项目' },
-        { node: 'item', name: '从项目创建模版' },
-        { node: 'divider' },
-        { node: 'item', name: '删除项目', type: 'danger' },
-    ];
+    const router = useRouter();
     return (<>
+        <UserList visible={visible} onCancel={change}></UserList>
         <Header style={{ backgroundColor: 'var(--semi-color-bg-1)' }}>
             <Nav
                 header={<><div style={{
@@ -38,10 +53,13 @@ export default function Union() {
                 mode="horizontal"
                 footer={<>
                     <Button
-                        theme="borderless"
-                        icon={<IconHelpCircle size="large" />}
+                        onClick={change}
+                        // theme="borderless"
+                        type="tertiary"
+                        icon={<IconUserListStroked />}
                         style={{
-                            color: 'var(--semi-color-text-2)',
+                            // color: 'var(--semi-color-text-2)',
+                            borderRadius: 'var(--semi-border-radius-circle)',
                             marginRight: '12px',
                         }} />
                     <Link href='/upload-manager/add'>
@@ -93,9 +111,19 @@ export default function Union() {
                         />
                         <ButtonGroup theme='borderless'>
                             <Button icon={<IconSendStroked />}></Button>
-                            <Button icon={<IconEdit2Stroked />}></Button>
-                            <Button icon={<IconDeleteStroked />}></Button>
+                            <Button icon={<IconEdit2Stroked />} onClick={()=> {
+                                router.push(`/upload-manager/edit/${item.id}`);
+                            }}></Button>
+                            <Popconfirm
+                                title="确定是否要删除？"
+                                content="此操作将不可逆"
+                                // onConfirm={onConfirm}
+                                // onCancel={onCancel}
+                            >
+                                <Button theme='borderless' icon={<IconDeleteStroked />}></Button>
+                            </Popconfirm>
                         </ButtonGroup>
+
                         {/* <SplitButtonGroup>
                             <Button theme="light" size='small'>编辑</Button>
                             <Dropdown menu={menu} trigger="click" position="bottomRight">
